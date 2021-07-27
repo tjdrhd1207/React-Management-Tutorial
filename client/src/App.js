@@ -10,6 +10,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import { withStyles } from '@material-ui/core/styles';
 import { render } from '@testing-library/react';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 const styles = theme => ({
@@ -20,6 +21,9 @@ const styles = theme => ({
   },
   table : {
     minWidth : 1080
+  },
+  progress: {
+    margin : theme.spacing.unit * 2
   }
 })
 
@@ -52,19 +56,29 @@ class App extends Component{
 class App extends Component{
 
   state = {
-    customers: ""
+    customers: "",
+    completed : 0 
   }
 
   componentDidMount(){
+    this.timer = setInterval(this.progress, 20);
+    /*
     this.callApi()
      .then(res => this.setState({customers : res}))
      .catch(err => console.log(err));
+     */
+    //api 호출이 발생되지 않기 때문에 customer의 값은 비어있기 때문에 progress바를 출력가능   
   }
 
   callApi = async() => {
     const response = await fetch('/api/customers');
     const body = await response.json();
     return body;
+  }
+
+  progress = () =>{
+    const { completed } = this.state;
+    this.setState({completed: completed >= 100 ? 0 : completed+1});
   }
 
   render(){
@@ -97,7 +111,12 @@ class App extends Component{
                 
                 />
                 );
-              }) : ""
+              }) : 
+              <TableRow>
+                <TableCell colSpan="6" align="center">
+                  <CircularProgress className={classes.progress} variant ="determine" value={this.state.completed}/>
+                </TableCell>
+            </TableRow>
           }
             
             </TableBody>
